@@ -10,6 +10,7 @@ from agentes import (
     agente_clima,
     agente_presupuesto,
     agente_reservas,
+    agente_actividades,
 )
 
 from config import MAX_PASOS
@@ -68,6 +69,7 @@ El sistema SOLO puede ayudar con:
 - Consultar el clima de un destino.
 - Calcular presupuestos y costos de viajes.
 - Consultar disponibilidad de cupos.
+- Recomendar actividades turísticas y lugares para visitar.
 - Crear reservas para salidas de fin de semana.
 - Combinar estas actividades para planear una salida.
 
@@ -123,6 +125,7 @@ class PlanEjecucion(BaseModel):
 
 
 
+
 def crear_plan(consulta: str) -> list[str]:
     instrucciones = f"""
 Eres un clasificador de intenciones para un sistema
@@ -150,6 +153,14 @@ Verdadero si el usuario:
 - Pregunta por disponibilidad o cupos.
 - Solicita gestionar una reserva.
 
+INTENCIÓN ACTIVIDADES:
+Verdadero si el usuario:
+- Pregunta qué actividades puede realizar en un destino.
+- Solicita recomendaciones de planes turísticos.
+- Pregunta qué lugares puede visitar.
+- Solicita opciones de senderismo, escalada,
+  gastronomía, museos o recorridos turísticos.
+
 REGLAS IMPORTANTES:
 1. Clasifica cada intención de forma independiente.
 2. No actives reservas solo porque se menciona
@@ -158,12 +169,12 @@ REGLAS IMPORTANTES:
    una salida, un sábado o un domingo.
 4. No actives presupuesto solo porque se menciona
    un número de personas.
-5. Una consulta puede necesitar uno, dos o tres agentes.
-6. No agregues tareas que el usuario no solicitó.
-7. Si la pregunta está fuera del dominio,
-   las tres intenciones deben ser false.
-
-
+5. No actives actividades si el usuario solamente
+   solicita clima, presupuesto o reservas.
+6. Una consulta puede necesitar varios agentes.
+7. No agregues tareas que el usuario no solicitó.
+8. Si la pregunta está fuera del dominio,
+   las cuatro intenciones deben ser false.
 
 CONSULTA A CLASIFICAR:
 {consulta}
@@ -184,6 +195,9 @@ CONSULTA A CLASIFICAR:
 
         if respuesta.necesita_reservas:
             plan.append("reservas")
+
+        if respuesta.necesita_actividades:
+            plan.append("actividades")
 
         return plan[:MAX_PASOS]
 
@@ -539,6 +553,18 @@ def nodo_reservas(estado):
     }
 
 
+def nodo_actividades(estado: EstadoPlaneador):
+    """
+    Ejecuta el agente de actividades turísticas
+    y registra su resultado en el estado del grafo.
+    """
+
+    return ejecutar_especialista(
+        estado,
+        "actividades",
+        agente_actividades
+    )
+
 
 def sintetizador(estado: EstadoPlaneador) -> dict:
     """Construye la respuesta final usando los resultados obtenidos."""
@@ -549,8 +575,8 @@ def sintetizador(estado: EstadoPlaneador) -> dict:
         return {
             "respuesta_final": (
                 "Solo puedo ayudarte a planear salidas de fin "
-                "de semana, incluyendo clima, presupuesto "
-                "y reservas."
+                "de semana, incluyendo clima, presupuesto, "
+                "reservas y actividades turísticas."
             )
         }
 
@@ -602,6 +628,7 @@ constructor.add_node("clima", nodo_clima)
 constructor.add_node("presupuesto", nodo_presupuesto)
 constructor.add_node("reservas", nodo_reservas)
 constructor.add_node("sintetizador", sintetizador)
+constructor.add_node("actividades", nodo_actividades)
 
 # Iniciar por el supervisor
 constructor.add_edge(START, "supervisor")
@@ -614,6 +641,7 @@ constructor.add_conditional_edges(
         "clima": "clima",
         "presupuesto": "presupuesto",
         "reservas": "reservas",
+        "actividades": "actividades",
         "fin": "sintetizador",
     },
 )
@@ -622,12 +650,15 @@ constructor.add_conditional_edges(
 constructor.add_edge("clima", "supervisor")
 constructor.add_edge("presupuesto", "supervisor")
 constructor.add_edge("reservas", "supervisor")
+constructor.add_edge("actividades", "supervisor")
 
 # Finalizar después del sintetizador
 constructor.add_edge("sintetizador", END)
 
+
 # Compilar el grafo
 grafo = constructor.compile()
+
 
 
 class IntencionesConsulta(BaseModel):
@@ -653,3 +684,17 @@ class IntencionesConsulta(BaseModel):
             "consultar disponibilidad o crear una reserva."
         )
     )
+
+    necesita_actividades: bool = Field(
+        description=(
+            "True únicamente si el usuario solicita "
+            "recomendaciones de actividades turísticas, "
+            "lugares para visitar o planes para realizar "
+            "en un destino, como senderismo, gastronomía, "
+            "museos, escalada o recorridos culturales. "
+            "False si solamente pregunta por clima, "
+            "presupuesto o reservas."
+        )
+    )
+
+    

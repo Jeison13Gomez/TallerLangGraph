@@ -427,10 +427,14 @@
         return;
       }
 
-      addTurn("bot", "modelo", answer,
-        `<b>${data.elapsedMs} ms</b> en el modelo · ${roundTrip} ms total · ${data.requestId}`,
-        data.usage ?? {},   // respuesta correcta sin `usage`: todos los valores "no disponible"
-        data.sources ?? []);
+      
+      addTurn(
+        "bot",
+        "modelo",
+        answer,
+        `<b>${data.elapsedMs} ms</b> en el modelo · ${roundTrip} ms total · ${data.requestId}`
+      );
+
 
     } catch (err) {
       const msg = err?.name === "TimeoutError"

@@ -1,0 +1,17 @@
+flowchart TD
+    START([START]) --> supervisor
+
+    supervisor{{"supervisor<br/>(clasificar_dominio + crear_plan)"}}
+
+    supervisor -->|"clima"| clima["nodo_clima<br/>agente_clima"]
+    supervisor -->|"presupuesto"| presupuesto["nodo_presupuesto<br/>agente_presupuesto"]
+    supervisor -->|"reservas"| reservas["nodo_reservas<br/>extraer_solicitud + validar + crear_reserva"]
+    supervisor -->|"actividades"| actividades["nodo_actividades<br/>agente_actividades"]
+    supervisor -->|"fin<br/>(fuera de dominio, plan vacío<br/>o sin pendientes)"| sintetizador
+
+    clima --> supervisor
+    presupuesto --> supervisor
+    reservas --> supervisor
+    actividades --> supervisor
+
+    sintetizador["sintetizador<br/>respuesta_final"] --> END([END])

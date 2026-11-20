@@ -1,6 +1,7 @@
 
 from langchain_core.tools import tool
 
+
 from datos import (
     DESTINOS,
     PRONOSTICO,
@@ -9,6 +10,7 @@ from datos import (
     buscar_destino,
     normalizar_dia,
     pesos,
+    ACTIVIDADES
 )
 
 
@@ -190,3 +192,42 @@ def crear_reserva(
         f"Cupos restantes: {CUPOS[llave]}."
     )
 
+
+@tool
+def recomendar_actividades(destino: str) -> str:
+    """
+    Recomienda actividades turísticas simuladas
+    para un destino cercano a Bogotá.
+
+    Args:
+        destino: Nombre del destino turístico.
+
+    Returns:
+        Lista de actividades disponibles para el destino.
+    """
+
+    destino_id = buscar_destino(destino)
+
+    if destino_id is None:
+        return (
+            f"No se encontraron actividades para '{destino}'. "
+            "Consulta los destinos disponibles."
+        )
+
+    actividades = ACTIVIDADES.get(destino_id, [])
+
+    if not actividades:
+        return (
+            f"No hay actividades registradas para {destino}."
+        )
+
+    nombre = DESTINOS[destino_id]["nombre"]
+
+    lista = "\n".join(
+        f"- {actividad}" for actividad in actividades
+    )
+
+    return (
+        f"Actividades recomendadas en {nombre}:\n"
+        f"{lista}"
+    )

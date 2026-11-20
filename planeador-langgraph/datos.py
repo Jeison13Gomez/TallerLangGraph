@@ -85,6 +85,40 @@ RESERVAS: list[dict] = []
 
 
 
+
+# Actividades turísticas simuladas por destino.
+# Información ficticia utilizada exclusivamente en el taller.
+
+ACTIVIDADES = {
+    "guatavita": [
+        "Senderismo por los alrededores de la laguna",
+        "Recorridos culturales e históricos",
+        "Fotografía de paisajes naturales"
+    ],
+    "zipaquira": [
+        "Visita turística a la Catedral de Sal",
+        "Recorrido por el centro histórico",
+        "Degustación de gastronomía típica"
+    ],
+    "villa de leyva": [
+        "Recorrido por la Plaza Mayor",
+        "Visita a museos y sitios históricos",
+        "Senderismo por paisajes naturales"
+    ],
+    "suesca": [
+        "Escalada en roca",
+        "Senderismo por los alrededores",
+        "Fotografía de paisajes y formaciones rocosas"
+    ],
+    "chicaque": [
+        "Senderismo por senderos ecológicos",
+        "Observación de aves",
+        "Fotografía de flora y fauna"
+    ]
+}
+
+
+
 def normalizar(texto: str) -> str:
     """Convierte texto a minúsculas, sin tildes ni espacios sobrantes."""
     sin_tildes = unicodedata.normalize("NFD", texto or "")

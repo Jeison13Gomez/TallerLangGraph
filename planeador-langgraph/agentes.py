@@ -11,6 +11,7 @@ from herramientas import (
     calcular_saldo,
     consultar_disponibilidad,
     crear_reserva,
+    recomendar_actividades,
 )
 
 
@@ -94,3 +95,30 @@ agente_reservas = create_agent(
     ),
 )
 
+
+# --------------------------------------------------
+# AGENTE DE ACTIVIDADES
+# --------------------------------------------------
+
+agente_actividades = create_agent(
+    model=modelo,
+    tools=[recomendar_actividades],
+    system_prompt=(
+        "Eres un agente especializado en recomendar "
+        "actividades turísticas para salidas de fin de semana "
+        "cerca de Bogotá. "
+
+        "Tu responsabilidad es identificar el destino "
+        "mencionado por el usuario y consultar la herramienta "
+        "recomendar_actividades para obtener las opciones. "
+
+        "REGLAS: "
+        "1. Utiliza siempre la herramienta recomendar_actividades. "
+        "2. Recomienda únicamente las actividades devueltas "
+        "por la herramienta. "
+        "3. No inventes actividades, horarios ni precios. "
+        "4. Si el destino no está disponible, informa al usuario. "
+        "5. Responde en español de forma clara y breve. "
+        "6. No realices reservas ni calcules presupuestos."
+    )
+)
