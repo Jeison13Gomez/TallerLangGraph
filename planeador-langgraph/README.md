@@ -116,6 +116,44 @@ Queremos ir a Suesca el sábado, somos 3 personas y tenemos $250.000. Si hay poc
 
 ¿Cómo estará el clima y qué actividades puedo realizar en Guatavita el domingo?
 
+
+## Ejecución desde la terminal
+
+Además de la interfaz web, el sistema puede ejecutarse
+directamente desde la terminal mediante `main.py`.
+
+Primero, iniciar los contenedores:
+
+```bash
+docker compose up -d
+```
+
+Después, ejecutar el programa:
+
+```bash
+docker compose exec -it api python main.py
+```
+
+El programa permite ingresar consultas de manera interactiva,
+visualizar los agentes seleccionados por el supervisor y
+obtener la respuesta final del sistema.
+
+Ejemplo:
+
+```text
+Tu consulta: ¿Qué actividades puedo realizar en Suesca?
+
+Agentes consultados:
+['actividades']
+
+Respuesta:
+En Suesca puedes realizar escalada en roca, senderismo
+y fotografía de paisajes.
+```
+
+Para finalizar la ejecución, escribir `salir`.
+
+
 ## Pruebas
 
 Se realizaron seis pruebas principales para validar la selección de agentes, los cálculos de presupuesto, la creación de reservas y el manejo de preguntas fuera del dominio.

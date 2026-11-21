@@ -13,6 +13,7 @@ COPY config.py .
 COPY datos.py .
 COPY grafo.py .
 COPY herramientas.py .
+COPY main.py .
 
 EXPOSE 8000
 
