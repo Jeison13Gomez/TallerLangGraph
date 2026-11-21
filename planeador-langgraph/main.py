@@ -1,9 +1,15 @@
 
 
+import sys
+
 from grafo import grafo
 
 
 def main():
+    if "--grafo" in sys.argv[1:]:
+        print(grafo.get_graph().draw_mermaid())
+        return
+
     print("=== PLANEADOR MULTIAGENTE ===")
     print("Escribe 'salir' para finalizar.\n")
 
